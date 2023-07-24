@@ -33,6 +33,7 @@ export abstract class Wave {
     private static position: Point = new Point(0,0);
     private static tileAmt : number;
     private static fill: Graphics;
+
     public static init(){
         this.tileAmt = Global.screenData.width/Wave.spriteSize;
         for (let i = 0; i < Wave.tileAmt; i++) {
@@ -43,7 +44,7 @@ export abstract class Wave {
         }
         this.fill = new Graphics()
             .beginFill(0x0b7caa)
-            .drawRect(this.position.x,this.position.y,Global.screenData.width,Global.currentwaveHeight)
+            .drawRect(this.position.x,this.position.y,Global.screenData.width,Global.screenData.height)
             .endFill();
             Global.gameStage.addChild(Wave.fill);
         this.fill.zIndex = Layers.background;
@@ -51,7 +52,7 @@ export abstract class Wave {
     }
     public static moveStep(){
         //move
-        Wave.position.y = Global.currentwaveHeight + Math.cos(Global.fixedFrame * .01);
+        Wave.position.y = Global.currentwaveHeight + Math.cos(Global.fixedFrame * .02) * 4;
         Wave.updatePosition();
         Wave.fill.position = this.position.add(new Point(0,Wave.spriteSize));
     }

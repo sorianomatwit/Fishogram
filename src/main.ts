@@ -22,21 +22,23 @@ export abstract class Global {
   static readonly FPS: number = 60;
   static readonly fixedIncrement: number = 1000 / Global.FPS;
   static readonly MAXFRAMESKIP = 10;
-  static rendererDeltaTime: number = 0;
-  static fixedGameTick: number = 0;
-  static oldTime: number = Date.now();
-  static fixedFrame: number = 0;
-  static frame: number = 0;
-  static startTime:number = Date.now();
+  static rendererDeltaTime : number = 0;
+  static fixedGameTick : number = 0;
+  static oldTime : number = Date.now();
+  static fixedFrame : number = 0;
+  static frame : number = 0;
+  static startTime : number = Date.now();
   static currentPercentHeight = .5;
   static totalwaveHeight = this.screenData.height * Global.currentPercentHeight;
   static currentwaveHeight = this.screenData.height * Global.currentPercentHeight;
   //application setup
-  static readonly renderer: Renderer = new Renderer({
+  static readonly renderer: Renderer = new Renderer(
+    {
     width: window.innerWidth,
     height: window.innerHeight,
     backgroundColor: 0x5A5A5A
-  })
+  }
+  )
   static readonly gameStage = new Container();
   static readonly universalTextStyle = new TextStyle({
     dropShadow: true,
@@ -59,7 +61,6 @@ export abstract class Global {
       array.splice(index, 1);
     }
   }
-
 }
 
 //@ts-expect-error 
@@ -93,9 +94,6 @@ function gameloop() {
   if (Math.floor((Date.now() - Global.startTime) /1000) == currentSec) {
 
     Global.fixedFrame++;
-    // if(timer <= 0) timer = 30;
-    // timer--;
-    // TimerText.text = timer.toString();
     currentSec++;
   }
   //fixed update

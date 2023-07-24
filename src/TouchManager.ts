@@ -39,7 +39,7 @@ export abstract class TouchManager {
 
     public static releaseTouch() {
         if(Anagram.isValidWord()){
-            if(Global.recordedWord.length > 0)Anagram.addWord();
+            if(Global.recordedWord.length > 0) Anagram.addWord();
         }
         Anagram.clear();
         Board.resetAllBox();

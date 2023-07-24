@@ -6,7 +6,7 @@ export abstract class Anagram {
     
     private static dictionary: Map<string, String[]> = new Map<string, String[]>();
     private static filteredList: String[] = [];
-    
+
     public static init() {
         const assetWords = dict.split('\n');
         for (let k = 0; k < 26; k++) {
@@ -106,8 +106,18 @@ export abstract class Anagram {
 
     public static addWord(){
         Global.usedWords.push(Global.recordedWord.toLowerCase());
-        //console.log(Global.usedWords);
-        
+        let loss = (0.005 * Global.recordedWord.length*Global.recordedWord.length);
+        if(Global.currentPercentHeight > 0){
+            Global.currentPercentHeight = (Global.currentPercentHeight - loss > 0)? Global.currentPercentHeight - loss: 0;
+            Global.currentwaveHeight =  Global.screenData.height * Global.currentPercentHeight;
+            console.log(Global.currentPercentHeight);
+        }
+        if(Global.usedWords.length % 3 == 0){
+            Anagram.generateLetters();
+            Board.updatetext();
+            console.log(Global.usedWords.length);
+            
+        }
     }
 
 
