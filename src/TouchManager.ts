@@ -1,7 +1,6 @@
 import { Point } from "pixi.js"
 import { Board } from "./Board";
 import { Anagram } from "./Anagram";
-import { Bar } from "./Bar";
 import { Global } from "./main";
 export abstract class TouchManager {
     public static happened: boolean = false;
@@ -40,7 +39,6 @@ export abstract class TouchManager {
 
     public static releaseTouch() {
         if(Anagram.isValidWord()){
-            Bar.addToFill(Global.recordedWord.length);
             if(Global.recordedWord.length > 0)Anagram.addWord();
         }
         Anagram.clear();

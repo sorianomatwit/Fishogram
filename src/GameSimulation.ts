@@ -1,80 +1,64 @@
-import { Graphics, Point } from "pixi.js";
+import { Graphics, Point, Sprite } from "pixi.js";
 import { Global, Layers } from "./main";
+import spriteAsset from './assets/fishi.png';
+import waveTile from './assets/wave.png';
 
-
-export abstract class Wall {
-    private static body: Graphics;
-    private static timefortravel: number = 30//.05;
-    private static distanceToTravel: number = 0;
-    private static timePassed: number = 0;
-    private static speed: number = 2;
-    public static readonly getPosition = () => this.body.position;
-
-    public static init() {
-        let width = Global.screenData.width * .10;
-        let height = Global.screenData.height * .35;
-        this.body = new Graphics()
-            .beginFill(0xA38DFC)
-            .drawRect(0, 0, width, height)
-            .endFill();
-        this.body.zIndex = Layers.hitboxes;
-        this.body.position = new Point(Global.screenData.width - width, Global.screenData.height * .05)
-        Global.gameStage.addChild(this.body);
-        this.distanceToTravel = Player.getPosition().subtract(this.body.position).magnitude();
-        console.log((this.distanceToTravel/this.timefortravel) );
-        
-    }
-
-    public static update() {
-        // move form right to left of the screen
-        //console.log(`${this.body.position} to ${this.body.position.subtract(new Point(this.speed * Global.fixedDeltaTime, 0))} `);
-        // if (!Player.isDead) {
-        //     this.body.position.subtract(new Point(this.speed, 0), this.body.position);
-        //     if (this.body.position.x < -this.body.width) this.reset();
-        // }
-
-        if(Global.frame % Global.FPS == 0){
-            this.timePassed++;
-            
-        } 
-        
-        if (this.body.position.x < -this.body.width) this.reset();
-    }
-    public static reset(){
-        this.body.position.x = Global.screenData.width;
-        this.timePassed = 0;
-    }
-}
-
-export abstract class Player {
-    public static isDead: boolean = false;
-    private static body: Graphics;
-    public static readonly getPosition = () => this.body.position;
-    public static init() {
-        let size = 15;
-        this.body = new Graphics()
-            .beginFill(0x0000FF)
-            .drawCircle(0, 0, size)
-            .endFill();
-        this.body.zIndex = Layers.background;
-        this.body.position = new Point(Global.screenData.width / 5, Global.screenData.height * .225)
-        Global.gameStage.addChild(this.body);
-    }
-    public static update() {
-        //moveing slightly up and down on like a sin wave or something
-        if (!this.isDead) {
-            this.body.position = new Point(this.body.x, 15 * Math.sin(.0008 * Global.fixedGameTick) + (Global.screenData.height * .225))
-        } else {
-            this.body.position.y += .7;
-        }
-
-        this.checkHit();
-
-    }
+export abstract class Fish {
+    private static fishSprite: Sprite = Sprite.from(spriteAsset);
+    private static position: Point = new Point(0,0);
     
+    private static hspd = 0.1;
+    public static init(){
+        Global.gameStage.addChild(Fish.fishSprite);
+        Fish.fishSprite.position = Fish.position;
+    }
 
-    private static checkHit() {
-        this.isDead = Wall.getPosition().x < this.body.position.x + this.body.width / 2;
+    public static moveStep(){
+        //update sprite
+        Fish.fishSprite.scale.x = Math.sign(-Fish.hspd);
+        //move
+        if(Fish.fishSprite.position.x > Global.screenData.width || Fish.fishSprite.position.x < 0){
+            Fish.hspd = -Fish.hspd;
+            Fish.position.x = (Math.sign(-Fish.hspd) > 0) ? Global.screenData.width - Fish.fishSprite.width : Fish.fishSprite.width ; 
+        }
+        Fish.position.x += Fish.hspd;
+        Fish.position.y = Global.currentwaveHeight + Math.sin(Fish.position.x *.08) * 5;
+        Fish.fishSprite.position = Fish.position;
     }
 }
 
+export abstract class Wave {
+    private static waveSprite: Sprite[] = [];
+    private static spriteSize = 64;
+    private static position: Point = new Point(0,0);
+    private static tileAmt : number;
+    private static fill: Graphics;
+    public static init(){
+        this.tileAmt = Global.screenData.width/Wave.spriteSize;
+        for (let i = 0; i < Wave.tileAmt; i++) {
+            Wave.waveSprite[i] = Sprite.from(waveTile);
+            Wave.waveSprite[i].zIndex = Layers.background;
+            Global.gameStage.addChild(Wave.waveSprite[i]);
+            Wave.waveSprite[i].position = Wave.position;
+        }
+        this.fill = new Graphics()
+            .beginFill(0x0b7caa)
+            .drawRect(this.position.x,this.position.y,Global.screenData.width,Global.currentwaveHeight)
+            .endFill();
+            Global.gameStage.addChild(Wave.fill);
+        this.fill.zIndex = Layers.background;
+        Wave.updatePosition();
+    }
+    public static moveStep(){
+        //move
+        Wave.position.y = Global.currentwaveHeight + Math.cos(Global.fixedFrame * .01);
+        Wave.updatePosition();
+        Wave.fill.position = this.position.add(new Point(0,Wave.spriteSize));
+    }
+
+    private static updatePosition() {
+        for (let i = 0; i < Wave.tileAmt; i++) {
+            Wave.waveSprite[i].position = Wave.position.add(new Point(i*Wave.spriteSize,0));
+        }
+    }
+}

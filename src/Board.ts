@@ -34,7 +34,7 @@ export abstract class Board {
         this.rectVars.width = Global.screenData.width * this.screenPercentage.width;
         this.rectVars.height = Global.screenData.height * this.screenPercentage.height;
         this.rectVars.X = Global.screenData.width / 2 - this.rectVars.width / 2;
-        this.rectVars.Y = Global.screenData.height * (1 - this.screenPercentage.height - .075/*buffer*/);
+        this.rectVars.Y = Global.screenData.height * (1 - this.screenPercentage.height - .015/*buffer*/);
 
         this.mainBoard = new Graphics()
             .beginFill(0x00FF00)
