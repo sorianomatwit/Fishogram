@@ -40,7 +40,7 @@ export abstract class TouchManager {
                 Global.isInGame = true;
             }
             Board.resetAllBox();
-            Anagram.clear();
+            Global.recordedWord = "";
         } else
             Board.selectBox(Board.findBox(touchPosition));
 
@@ -55,7 +55,7 @@ export abstract class TouchManager {
                 Anagram.addWord();
                 Global.isInGame = true;
             }
-            Anagram.clear();
+            Global.recordedWord = "";
             Board.resetAllBox();
         } else {
             console.log("press");

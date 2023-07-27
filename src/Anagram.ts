@@ -17,17 +17,6 @@ export abstract class Anagram {
             this.dictionary.get(word.charAt(0))?.push(word);
         }
     }
-
-    public static recordChar(c: string) {
-        Global.recordedWord += c;
-        //console.log(`${Global.recordedWord} : ${this.isValidWord()}`);
-        
-    }
-
-    public static clear() {
-        Global.recordedWord = "";
-    }
-
     public static generateLetters(updateText: boolean = true) {
         Global.usedWords = [];
         Global.recordedWord = "";
@@ -38,22 +27,25 @@ export abstract class Anagram {
         };
         const letters: string[] = Object.keys(letterFrequencies);
         const probabilities: number[] = Object.values(letterFrequencies);
-        let alpheNum: number[] = new Array(26).fill(0);
+        let alphaCnt: number[] = new Array(26).fill(0);
+
         const cumulativeProbabilities: number[] = [];
         let cumulativeProbability = 0;
+        //create a list of the probabilty for each letter at a certain range
         for (let i = 0; i < probabilities.length; i++) {
             cumulativeProbability += probabilities[i];
             cumulativeProbabilities.push(cumulativeProbability);
         }
+        //generate the letter by selecting a random number correlation to its probablity
         for (let j = 0; j < 16; j++) {
             const randomValue = Math.random();
             for (let k = 0; k < cumulativeProbabilities.length; k++) {
                 if (randomValue <= cumulativeProbabilities[k]) {
                     const letter = letters[k];
                     let m = letter.charCodeAt(0) - 65;
-                    alpheNum[m]++;
+                    alphaCnt[m]++;
                     Global.anagramLetters[j] = letter;
-                    if (alpheNum[m] >= 2) {
+                    if (alphaCnt[m] >= 2) {
                         cumulativeProbabilities[k] = 0;
                         k--;
                     }
@@ -82,7 +74,7 @@ export abstract class Anagram {
             }
         }
 
-        //filter 2
+        //filter by whether the word has all characters
         let subset = subsetSet.join("");
         for (let i = this.filteredList.length - 1; i > 0; i--) {
             let word = this.filteredList[i];
@@ -94,21 +86,15 @@ export abstract class Anagram {
             }
         }
     }
-
     public static isValidWord(): boolean {
         return Global.recordedWord.length >= 3 && this.filteredList.indexOf(Global.recordedWord.toLowerCase()) != -1 && Global.usedWords.indexOf(Global.recordedWord.toLowerCase()) == -1;
     }
-
     public static addWord(){
         Global.usedWords.push(Global.recordedWord.toLowerCase());
-        //console.log(Global.isCombo);
-        
         let increase = Global.isCombo? .07 * (Global.recordedWord.length - 3) + .12 : .07 * (Global.recordedWord.length - 3) + .1;
         if(Global.currentPercentHeight > 0){
             Global.currentPercentHeight = (Global.currentPercentHeight - increase > 0)? Global.currentPercentHeight - increase: 0;
             Global.currentwaveHeight =  Global.screenData.height * Global.currentPercentHeight;
-            //console.log(Global.currentPercentHeight);
         }
     }
-
 }

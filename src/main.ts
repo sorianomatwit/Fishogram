@@ -1,4 +1,4 @@
-import { Container, Renderer, TextStyle, Text, Point, Graphics } from "pixi.js";
+import { Container, Renderer, TextStyle, Text, Graphics } from "pixi.js";
 import { Board, Bar } from "./Board";
 import { TouchManager } from "./TouchManager";
 import { Anagram } from "./Anagram";
@@ -33,6 +33,7 @@ export abstract class Global {
   static currentPercentHeight = .5;
   static totalWavePercent = Global.currentPercentHeight;
   static currentwaveHeight = this.screenData.height * Global.currentPercentHeight;
+
   //application setup
   static readonly renderer: Renderer = new Renderer(
     {
@@ -60,6 +61,7 @@ export abstract class Global {
   public static anagramLetters: string[] = [];
   public static recordedWord: string = "";
   public static usedWords: String[] = [];
+  public static boardBuffer = 0.045;
   public static isCombo: boolean = false;
   public static isDraining: boolean = false;
   public static isInGame: boolean = false; // if the user has input a word for the first time
@@ -85,11 +87,9 @@ export abstract class Global {
     Global.currentPercentHeight = .5;
     Bar.update();
     Board.resetAllBox();
-    Anagram.clear();
-
+    Global.recordedWord = "";
   }
 }
-
 abstract class EndScreen {
   static mainText = new Text("!!YOU LOSE!!", Global.universalTextStyle);
   static readonly background = new Graphics()
@@ -114,7 +114,6 @@ abstract class EndScreen {
   }
 }
 
-
 //@ts-expect-error 
 document.body.appendChild(Global.renderer.view);
 document.documentElement.style.overflow = 'hidden';
@@ -122,8 +121,8 @@ let scrollTop = window.scrollY || document.documentElement.scrollTop;
 let scrollLeft = window.scrollX || document.documentElement.scrollLeft;
 window.onscroll = () => window.scrollTo(scrollLeft, scrollTop);
 Global.gameStage.sortDirty = true;
-
 EndScreen.init();
+
 //Game setup
 Fish.init();
 Wave.init();
@@ -131,9 +130,8 @@ Pipe.init();
 Anagram.init();
 Board.init();
 Bar.init();
-
-
 Global.gameStage.sortChildren();
+
 function simulate() {
   Bar.update();
   Fish.moveStep();
@@ -167,7 +165,7 @@ function simulate() {
   }
 }
 
-let currentSec = 1;
+
 function gameloop() {
   TouchManager.collectInput();
   let newTime = Date.now();
@@ -190,7 +188,7 @@ function gameloop() {
   Global.renderer.render(Global.currentStage);
   requestAnimationFrame(gameloop);
 }
-TouchManager.collectInput();
+//gameloop call
 gameloop();
 
 

@@ -40,8 +40,6 @@ export abstract class Wave {
     private static fill: Graphics;
     public static isMoving: boolean = false;
     public static init() {
-        console.log("hello");
-
         Wave.tileAmt = Global.screenData.width / Wave.spriteSize;
         for (let i = 0; i < Wave.tileAmt; i++) {
             Wave.waveSprite[i] = Sprite.from(waveAsset);
@@ -63,18 +61,16 @@ export abstract class Wave {
         let sway = Math.cos(Fish.position.x * .08) * amp;
         //move
         Wave.isMoving = Wave.position.y > Global.currentwaveHeight + amp && Wave.position.y > 0;
-        if (Wave.isMoving ) {
-           // console.log("move");
+        if (Wave.isMoving) {
             Wave.position.y -= Global.difficulty.fillRate * Global.fixedDeltaTime;
 
         } else Wave.position.y = Global.currentwaveHeight;
-        if ((Global.currentPercentHeight >= Global.totalWavePercent || Global.currentwaveHeight == 0) && !Global.isInGame  ) Wave.position.y = Global.currentwaveHeight + sway;
-        
-        
+        if ((Global.currentPercentHeight >= Global.totalWavePercent || Global.currentwaveHeight == 0) && !Global.isInGame) Wave.position.y = Global.currentwaveHeight + sway;
+
+
         Wave.updatePosition();
         Wave.fill.position = this.position.add(new Point(0, Wave.spriteSize));
     }
-
     private static updatePosition() {
         for (let i = 0; i < Wave.tileAmt; i++) {
             Wave.waveSprite[i].position = Wave.position.add(new Point(i * Wave.spriteSize, 0));
@@ -85,15 +81,15 @@ export abstract class Wave {
 export abstract class Pipe {
     private static pipeSprite: Sprite = Sprite.from(pipeAsset);
     public static isEnd = false;
-    public static init(){
+    public static init() {
         Pipe.pipeSprite.position.x = Global.screenData.width - 64;
         Global.gameStage.addChild(Pipe.pipeSprite);
     }
-    public static checkWin(): boolean{
+    public static checkWin(): boolean {
         return (Pipe.pipeSprite.containsPoint(Fish.position))
     }
 }
 
 export abstract class Scene {
-    
+
 }

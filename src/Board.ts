@@ -31,12 +31,11 @@ export abstract class Board {
         rows: 4,
     }
 
-
     public static init() {
         this.rectVars.width = Global.screenData.width * this.screenPercentage.width;
         this.rectVars.height = Global.screenData.height * this.screenPercentage.height;
         this.rectVars.X = Global.screenData.width / 2 - this.rectVars.width / 2 + Global.screenData.width * .1;
-        this.rectVars.Y = Global.screenData.height * (1 - this.screenPercentage.height - .045/*buffer*/);
+        this.rectVars.Y = Global.screenData.height * (1 - this.screenPercentage.height - Global.boardBuffer/*buffer*/);
 
         this.mainBoard = new Graphics()
             .beginFill(0x00FF00)
@@ -78,10 +77,10 @@ export abstract class Board {
             );
             Global.gameStage.addChild(this.grid[i], this.displayText[i], this.hitboxes[i]);
         }
-
     }
-    public static getPoint(): Point { return new Point(this.rectVars.X, this.rectVars.Y); }
-
+    public static getPoint(): Point { 
+        return new Point(this.rectVars.X, this.rectVars.Y); 
+    }
     public static updatetext() {
         for (let i = 0; i < this.grid.length; i++) {
             if (this.displayText[i] != null) Global.gameStage.removeChild(this.displayText[i]);
@@ -98,7 +97,6 @@ export abstract class Board {
             Global.gameStage.addChild(this.displayText[i]);
         }
     }
-    //private static 
     private static addLine(boxPosition: Point) {
         let wid = this.rectVars.width / 4;
         let len = this.rectVars.height / 4;
@@ -120,7 +118,6 @@ export abstract class Board {
                 Global.gameStage.addChild(this.selectedLines[i]);
             }
         }
-
     }
     private static removeLine(boxPosition: Point) {
         let posIndex = this.selectedBoxPoints.indexOf(boxPosition)
@@ -142,8 +139,8 @@ export abstract class Board {
             for (let i = 0; i < this.grid.length && this.currentSelectedIndexes.length > 0; i++) {
                 let otherBoxPoint = this.getCoord(i);
                 let mag = this.currentSelectedBox.subtract(otherBoxPoint).magnitude();
+                
                 //default hitbox
-
                 let hitbox: Graphics = this.hitboxes[i];
                 hitbox.width = this.rectVars.width / 4;
                 hitbox.height = this.rectVars.height / 4;
@@ -156,13 +153,9 @@ export abstract class Board {
                     if (!this.activeBoxes[i]) {
                         availableIndexes.push(i);
                         if (mag > 1) {
-                            //corner hitbox
-                            //console.log("hit");
-
                             let diff = this.currentSelectedBox.subtract(otherBoxPoint);
                             diff = diff.subtract(new Point(1, 1))
                             diff = diff.multiplyScalar(-.5);
-                            //console.log(`${Global.anagramLetters[i]} : ${diff}`);
                             hitbox.width = 20;
                             hitbox.height = 20;
                             let x = this.rectVars.X + ((this.rectVars.width / 4) * (recentIndex % 4)) + diff.y * (this.rectVars.width / 4) - hitbox.width * diff.y;
@@ -183,7 +176,6 @@ export abstract class Board {
                     let y = this.rectVars.Y + ((this.rectVars.height / 4) * Math.floor(i / 4))
                     hitbox.position = new Point(x, y);
                     this.grid[i].tint = (Anagram.isValidWord()) ? 0x50C878 : this.secondaryTint;
-                    //console.log(`${Global.recordedWord} : ${Anagram.isValidWord()}`);
                     if (Global.usedWords.indexOf(Global.recordedWord.toLowerCase()) != -1) {
                         this.grid[i].tint = 0xFF0000;
                     }
@@ -195,7 +187,7 @@ export abstract class Board {
                 this.currentSelectedIndexes.push(index) //* this.rectVars.rows
                 recentIndex = this.currentSelectedIndexes[this.currentSelectedIndexes.length - 1];
                 this.activeBoxes[recentIndex] = true;
-                Anagram.recordChar(Global.anagramLetters[recentIndex]);
+                Global.recordedWord += Global.anagramLetters[recentIndex];
                 this.currentSelectedBox = this.getCoord(index);
             }
 
@@ -271,14 +263,11 @@ export abstract class Bar {
         Y: 0,
     }
 
-
     public static init() {
         this.rectVars.width = Global.screenData.width * .15;
         this.rectVars.height = Global.screenData.height * Board.screenPercentage.height;
         this.rectVars.X = Global.screenData.width * .05;
-        this.rectVars.Y = Global.screenData.height * (1 - Board.screenPercentage.height - .045/*buffer*/);
-
-
+        this.rectVars.Y = Global.screenData.height * (1 - Board.screenPercentage.height - Global.boardBuffer/*buffer*/);
         Bar.backBar = new Graphics()
             .beginFill(Bar.colors[0])
             .drawRoundedRect(this.rectVars.X, this.rectVars.Y, this.rectVars.width, this.rectVars.height, 15)
@@ -297,7 +286,6 @@ export abstract class Bar {
         Bar.frontBar.zIndex = Layers.background;
         Global.gameStage.addChild(Bar.frontBar);
     }
-
     public static update() {
         Bar.percent = (Math.min(Global.usedWords.length, 3) / 3);
         Bar.frontBar.clear()
@@ -307,10 +295,7 @@ export abstract class Bar {
         Bar.frontBar.position = new Point(this.rectVars.X + Bar.xBuffer, this.rectVars.Y + Bar.yBuffer + Bar.innerLen * (1-Bar.percent));
         Bar.frontBar.updateTransform();
     }
-
     public static isTriggered(touch : Point) : boolean{
         return Bar.backBar.containsPoint(touch) && Bar.innerLen == Bar.frontBar.height;
-    }
-
-    
+    }    
 }
