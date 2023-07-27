@@ -45,7 +45,6 @@ export abstract class Anagram {
             cumulativeProbability += probabilities[i];
             cumulativeProbabilities.push(cumulativeProbability);
         }
-
         for (let j = 0; j < 16; j++) {
             const randomValue = Math.random();
             for (let k = 0; k < cumulativeProbabilities.length; k++) {
@@ -60,6 +59,7 @@ export abstract class Anagram {
                     }
                     break;
                 }
+                
             }
         }
         Global.anagramLetters.join('');
@@ -81,9 +81,6 @@ export abstract class Anagram {
                 }
             }
         }
-        // console.log(`Subset: ${subsetSet}`);
-        // console.log(`filter 1: ${this.filteredList.length} / ${dict.split('\n').length}`);
-        // console.log(this.filteredList);
 
         //filter 2
         let subset = subsetSet.join("");
@@ -96,32 +93,22 @@ export abstract class Anagram {
                 }
             }
         }
-        // console.log(this.filteredList);
-        // console.log(`filter 2: ${this.filteredList.length} / ${dict.split('\n').length}`);
     }
 
     public static isValidWord(): boolean {
-        return this.filteredList.indexOf(Global.recordedWord.toLowerCase()) != -1 && Global.usedWords.indexOf(Global.recordedWord.toLowerCase()) == -1;
+        return Global.recordedWord.length >= 3 && this.filteredList.indexOf(Global.recordedWord.toLowerCase()) != -1 && Global.usedWords.indexOf(Global.recordedWord.toLowerCase()) == -1;
     }
 
     public static addWord(){
         Global.usedWords.push(Global.recordedWord.toLowerCase());
-        let loss = (0.005 * Global.recordedWord.length*Global.recordedWord.length);
+        //console.log(Global.isCombo);
+        
+        let increase = Global.isCombo? .07 * (Global.recordedWord.length - 3) + .12 : .07 * (Global.recordedWord.length - 3) + .1;
         if(Global.currentPercentHeight > 0){
-            Global.currentPercentHeight = (Global.currentPercentHeight - loss > 0)? Global.currentPercentHeight - loss: 0;
+            Global.currentPercentHeight = (Global.currentPercentHeight - increase > 0)? Global.currentPercentHeight - increase: 0;
             Global.currentwaveHeight =  Global.screenData.height * Global.currentPercentHeight;
-            console.log(Global.currentPercentHeight);
-        }
-        if(Global.usedWords.length % 3 == 0){
-            Anagram.generateLetters();
-            Board.updatetext();
-            console.log(Global.usedWords.length);
-            
+            //console.log(Global.currentPercentHeight);
         }
     }
-
-
-
-
 
 }

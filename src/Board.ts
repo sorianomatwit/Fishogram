@@ -2,6 +2,9 @@ import { Graphics, Text, Point } from "pixi.js";
 import { Global, Layers } from "./main";
 import '@pixi/math-extras';
 import { Anagram } from "./Anagram";
+
+
+
 export abstract class Board {
     public static mainBoard: Graphics;
     private static grid: Graphics[] = [];
@@ -15,9 +18,9 @@ export abstract class Board {
     private static activeBoxes: boolean[] = [];
     private static selectedLines: Graphics[] = [];
     private static fontSize: number = 0;
-    private static screenPercentage = {
+    public static screenPercentage = {
         height: .35,
-        width: .80
+        width: .70
     }
     private static rectVars = {
         width: 0,
@@ -26,15 +29,14 @@ export abstract class Board {
         Y: 0,
         cols: 4,
         rows: 4,
-
     }
 
 
     public static init() {
         this.rectVars.width = Global.screenData.width * this.screenPercentage.width;
         this.rectVars.height = Global.screenData.height * this.screenPercentage.height;
-        this.rectVars.X = Global.screenData.width / 2 - this.rectVars.width / 2;
-        this.rectVars.Y = Global.screenData.height * (1 - this.screenPercentage.height - .015/*buffer*/);
+        this.rectVars.X = Global.screenData.width / 2 - this.rectVars.width / 2 + Global.screenData.width * .1;
+        this.rectVars.Y = Global.screenData.height * (1 - this.screenPercentage.height - .045/*buffer*/);
 
         this.mainBoard = new Graphics()
             .beginFill(0x00FF00)
@@ -135,7 +137,7 @@ export abstract class Board {
 
         if (index != -1) {
             let availableIndexes: number[] = [];
-            let recentIndex = (this.currentSelectedIndexes.length <= 0)? index: this.currentSelectedIndexes[this.currentSelectedIndexes.length - 1];
+            let recentIndex = (this.currentSelectedIndexes.length <= 0) ? index : this.currentSelectedIndexes[this.currentSelectedIndexes.length - 1];
 
             for (let i = 0; i < this.grid.length && this.currentSelectedIndexes.length > 0; i++) {
                 let otherBoxPoint = this.getCoord(i);
@@ -156,7 +158,7 @@ export abstract class Board {
                         if (mag > 1) {
                             //corner hitbox
                             //console.log("hit");
-                            
+
                             let diff = this.currentSelectedBox.subtract(otherBoxPoint);
                             diff = diff.subtract(new Point(1, 1))
                             diff = diff.multiplyScalar(-.5);
@@ -170,10 +172,10 @@ export abstract class Board {
                         }
                     }
                 }
-                
+
                 //highlights if used word
                 if (this.activeBoxes[i]) {
-                    
+
                     let hitbox: Graphics = this.hitboxes[i];
                     hitbox.width = this.rectVars.width / 4;
                     hitbox.height = this.rectVars.height / 4;
@@ -186,7 +188,7 @@ export abstract class Board {
                         this.grid[i].tint = 0xFF0000;
                     }
                 }
-                
+
             }
 
             if (this.currentSelectedIndexes.indexOf(index) == -1 && index >= 0 && (availableIndexes.indexOf(index) != -1 || this.currentSelectedIndexes.length <= 0)) {
@@ -196,11 +198,11 @@ export abstract class Board {
                 Anagram.recordChar(Global.anagramLetters[recentIndex]);
                 this.currentSelectedBox = this.getCoord(index);
             }
-            
+
             //highlights box if it is a valid word
             //console.log(this.currentSelectedIndexes);
-            
-            if (recentIndex>= 0 ) {
+
+            if (recentIndex >= 0) {
                 let Box: Graphics = this.grid[recentIndex];
                 if (this.selectedBoxPoints.indexOf(Box.position) == -1) this.currentSelectedBox = this.getCoord(recentIndex);
                 this.addLine(Box.position);
@@ -252,4 +254,63 @@ export abstract class Board {
 
         return priority;
     }
+}
+
+export abstract class Bar {
+    private static backBar: Graphics;
+    private static frontBar: Graphics;
+    private static colors: number[] = [0x1C30A0, 0xFA3BA1];
+    private static innerLen: number = 0;
+    private static xBuffer = 0;
+    private static yBuffer = 0;
+    private static percent = 0;
+    public static rectVars = {
+        width: 0,
+        height: 0,
+        X: 0,
+        Y: 0,
+    }
+
+
+    public static init() {
+        this.rectVars.width = Global.screenData.width * .15;
+        this.rectVars.height = Global.screenData.height * Board.screenPercentage.height;
+        this.rectVars.X = Global.screenData.width * .05;
+        this.rectVars.Y = Global.screenData.height * (1 - Board.screenPercentage.height - .045/*buffer*/);
+
+
+        Bar.backBar = new Graphics()
+            .beginFill(Bar.colors[0])
+            .drawRoundedRect(this.rectVars.X, this.rectVars.Y, this.rectVars.width, this.rectVars.height, 15)
+            .endFill();
+        Bar.backBar.zIndex = Layers.background;
+        Global.gameStage.addChild(Bar.backBar);
+        Bar.xBuffer = this.rectVars.width * .05;
+        Bar.yBuffer = this.rectVars.height * .01;
+        Bar.innerLen = this.rectVars.height - Bar.yBuffer * 2;
+        Bar.frontBar = new Graphics()
+            .beginFill(Bar.colors[1])
+            .drawRoundedRect(0, 0, this.rectVars.width - Bar.xBuffer * 2, 0, 15)
+            .endFill();
+        Bar.frontBar.position = new Point(this.rectVars.X + Bar.xBuffer,this.rectVars.Y + Bar.yBuffer);
+        console.log(`starting: ${this.rectVars.X + Bar.xBuffer}`);
+        Bar.frontBar.zIndex = Layers.background;
+        Global.gameStage.addChild(Bar.frontBar);
+    }
+
+    public static update() {
+        Bar.percent = (Math.min(Global.usedWords.length, 3) / 3);
+        Bar.frontBar.clear()
+            .beginFill(Bar.colors[1])
+            .drawRoundedRect(0,0,this.rectVars.width - Bar.xBuffer * 2, Bar.innerLen * Bar.percent, 15)
+            .endFill();
+        Bar.frontBar.position = new Point(this.rectVars.X + Bar.xBuffer, this.rectVars.Y + Bar.yBuffer + Bar.innerLen * (1-Bar.percent));
+        Bar.frontBar.updateTransform();
+    }
+
+    public static isTriggered(touch : Point) : boolean{
+        return Bar.backBar.containsPoint(touch) && Bar.innerLen == Bar.frontBar.height;
+    }
+
+    
 }
