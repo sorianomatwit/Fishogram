@@ -60,7 +60,7 @@ export abstract class Wave {
     }
     public static moveStep() {
         let amp = 4;
-        let sway = Math.cos(Global.fixedGameTick * .001) * amp;
+        let sway = Math.cos(Fish.position.x * .08) * amp;
         //move
         Wave.isMoving = Wave.position.y > Global.currentwaveHeight + amp && Wave.position.y > 0;
         if (Wave.isMoving ) {
