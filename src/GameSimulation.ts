@@ -77,7 +77,6 @@ export abstract class Wave {
         }
     }
 }
-
 export abstract class Pipe {
     private static pipeSprite: Sprite = Sprite.from(pipeAsset);
     public static isEnd = false;
@@ -88,8 +87,4 @@ export abstract class Pipe {
     public static checkWin(): boolean {
         return (Pipe.pipeSprite.containsPoint(Fish.position))
     }
-}
-
-export abstract class Scene {
-
 }

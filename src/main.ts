@@ -152,7 +152,6 @@ function simulate() {
 
   Global.isDraining = Global.isInGame && !Wave.isMoving
   if (Global.isDraining) {
-    // console.log("drain");
     Global.isCombo = false;
     Global.currentPercentHeight += Global.difficulty.drainRate * Global.fixedDeltaTime;
     Global.currentwaveHeight = Global.screenData.height * Global.currentPercentHeight;
@@ -164,7 +163,6 @@ function simulate() {
     EndScreen.mainText.text = "!!YOU LOSE!!";
   }
 }
-
 
 function gameloop() {
   TouchManager.collectInput();
@@ -190,7 +188,4 @@ function gameloop() {
 }
 //gameloop call
 gameloop();
-
-
-
 
